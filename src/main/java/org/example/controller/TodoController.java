@@ -1,7 +1,8 @@
 package org.example.controller;
 
 import lombok.AllArgsConstructor;
-import org.example.model.TodoEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.example.model.TodoModel;
 import org.example.model.TodoRequest;
 import org.example.model.TodoResponse;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j              // 로그 표시를 위함
 @CrossOrigin        // cors 이슈를 막기 위함
 @AllArgsConstructor
 @RestController     // controller라는 것을 알려주기 위함
@@ -24,7 +26,7 @@ public class TodoController {
     @PostMapping
     // 추가 역할
     public ResponseEntity<TodoResponse> create(@RequestBody TodoRequest request) {
-        System.out.println("CREATE");
+        log.info("CREATE");
 
         if (ObjectUtils.isEmpty(request.getTitle()))
             return ResponseEntity.badRequest().build();
@@ -37,25 +39,25 @@ public class TodoController {
         if (ObjectUtils.isEmpty(request.getCompleted()))
             request.setCompleted(false);
 
-        TodoEntity result = this.service.add(request);
+        TodoModel result = this.service.add(request);
         return ResponseEntity.ok(new TodoResponse(result));
     }
 
     @GetMapping("{id}")
     // 한 개만 읽어오는 역할
     public ResponseEntity<TodoResponse> readOne(@PathVariable Long id) {
-        System.out.println("READ ONE");
+        log.info("READ ONE");
 
-        TodoEntity result = this.service.searchById(id);
+        TodoModel result = this.service.searchById(id);
         return ResponseEntity.ok(new TodoResponse(result));
     }
 
     @GetMapping
     // 전체를 읽어오는 역할
     public ResponseEntity<List<TodoResponse>> readAll() {
-        System.out.println("READ ALL");
+        log.info("READ ALL");
 
-        List<TodoEntity> list = this.service.searchAll();
+        List<TodoModel> list = this.service.searchAll();
         List<TodoResponse> response = list.stream().map(TodoResponse::new)
                 .collect(Collectors.toList());    // TodoResponse 리스트로 변환
 
@@ -65,16 +67,16 @@ public class TodoController {
     @PatchMapping("{id}")
     // 수정 역할
     public ResponseEntity<TodoResponse> update(@PathVariable Long id, @RequestBody TodoRequest request) {
-        System.out.println("UPDATE");
+        log.info("UPDATE");
 
-        TodoEntity result = this.service.updateById(id, request);
+        TodoModel result = this.service.updateById(id, request);
         return ResponseEntity.ok(new TodoResponse(result));
     }
 
     @DeleteMapping("{id}")
     // 한 개만 삭제하는 역할
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
-        System.out.println("DELETE ONE");
+        log.info("DELETE ONE");
 
         this.service.deleteById(id);
 
@@ -85,7 +87,7 @@ public class TodoController {
     @DeleteMapping
     // 모두 삭제하는 역할
     public ResponseEntity<?> deleteAll() {
-        System.out.println("DELETE ALL");
+        log.info("DELETE ALL");
 
         this.service.deleteAll();
         return ResponseEntity.ok().build();
